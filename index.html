@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-zinc-950">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CatálogoDaniel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script id="sheetjs-script" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ESTILO CRISTAL TRANSLÚCIDO 3D CON BORDE NEÓN */
+    .neon-glass-card {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 50%, rgba(9, 9, 11, 0.48) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 1.5rem;
+      border: 1.5px solid var(--neon-border);
+      box-shadow:
+        0 14px 32px -6px rgba(0, 0, 0, 0.75),
+        0 0 24px var(--neon-glow),
+        inset 0 1px 1px rgba(255, 255, 255, 0.28),
+        inset 0 -10px 22px var(--neon-inner);
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .neon-glass-wrap {
+      position: relative;
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .neon-glass-wrap::after {
+      content: "";
+      position: absolute;
+      bottom: -12px;
+      left: 14%;
+      right: 14%;
+      height: 10px;
+      border-radius: 9999px;
+      border: 1.5px solid var(--neon-border);
+      background: radial-gradient(ellipse at center, var(--neon-glow) 0%, transparent 75%);
+      box-shadow: 0 0 18px var(--neon-glow);
+      opacity: 0.85;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .group:hover .neon-glass-wrap {
+      transform: translateY(-8px) scale(1.04);
+    }
+
+    .group:hover .neon-glass-card {
+      box-shadow:
+        0 20px 40px -6px rgba(0, 0, 0, 0.85),
+        0 0 36px var(--neon-glow-strong),
+        inset 0 1px 2px rgba(255, 255, 255, 0.45),
+        inset 0 -12px 26px var(--neon-inner);
+    }
+
+    .group:hover .neon-glass-wrap::after {
+      opacity: 1;
+      transform: scaleX(1.06);
+    }
+
+    .neon-svg-glow {
+      filter: drop-shadow(0 0 8px var(--neon-glow-strong)) drop-shadow(0 0 2px var(--neon-stroke));
+    }
+
+    .neon-peliculas {
+      --neon-stroke: #818cf8;
+      --neon-border: rgba(129, 140, 248, 0.65);
+      --neon-glow: rgba(99, 102, 241, 0.38);
+      --neon-glow-strong: rgba(129, 140, 248, 0.78);
+      --neon-inner: rgba(99, 102, 241, 0.22);
+    }
+
+    .neon-series {
+      --neon-stroke: #34d399;
+      --neon-border: rgba(52, 211, 153, 0.65);
+      --neon-glow: rgba(16, 185, 129, 0.38);
+      --neon-glow-strong: rgba(52, 211, 153, 0.78);
+      --neon-inner: rgba(16, 185, 129, 0.22);
+    }
+
+    .neon-novelas {
+      --neon-stroke: #fb7185;
+      --neon-border: rgba(251, 113, 133, 0.65);
+      --neon-glow: rgba(244, 63, 94, 0.38);
+      --neon-glow-strong: rgba(251, 113, 133, 0.78);
+      --neon-inner: rgba(244, 63, 94, 0.22);
+    }
+
+    .neon-animados {
+      --neon-stroke: #fbbf24;
+      --neon-border: rgba(251, 191, 36, 0.65);
+      --neon-glow: rgba(245, 158, 11, 0.38);
+      --neon-glow-strong: rgba(251, 191, 36, 0.78);
+      --neon-inner: rgba(245, 158, 11, 0.22);
+    }
+
+    .neon-manga {
+      --neon-stroke: #22d3ee;
+      --neon-border: rgba(34, 211, 238, 0.65);
+      --neon-glow: rgba(6, 182, 212, 0.38);
+      --neon-glow-strong: rgba(34, 211, 238, 0.78);
+      --neon-inner: rgba(6, 182, 212, 0.22);
+    }
+
+    .neon-orange {
+      --neon-stroke: #fb923c;
+      --neon-border: rgba(251, 146, 60, 0.65);
+      --neon-glow: rgba(249, 115, 22, 0.38);
+      --neon-glow-strong: rgba(251, 146, 60, 0.78);
+      --neon-inner: rgba(249, 115, 22, 0.22);
+    }
+
+    .neon-purple {
+      --neon-stroke: #c084fc;
+      --neon-border: rgba(192, 132, 252, 0.65);
+      --neon-glow: rgba(168, 85, 247, 0.38);
+      --neon-glow-strong: rgba(192, 132, 252, 0.78);
+      --neon-inner: rgba(168, 85, 247, 0.22);
+    }
+
+    .neon-sky {
+      --neon-stroke: #38bdf8;
+      --neon-border: rgba(56, 189, 248, 0.65);
+      --neon-glow: rgba(14, 165, 233, 0.38);
+      --neon-glow-strong: rgba(56, 189, 248, 0.78);
+      --neon-inner: rgba(14, 165, 233, 0.22);
+    }
+
+    .neon-yellow {
+      --neon-stroke: #facc15;
+      --neon-border: rgba(250, 204, 21, 0.65);
+      --neon-glow: rgba(234, 179, 8, 0.38);
+      --neon-glow-strong: rgba(250, 204, 21, 0.78);
+      --neon-inner: rgba(234, 179, 8, 0.22);
+    }
+  </style>
+</head>
+<body class="min-h-full bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-rose-500 selection:text-white">
+
+  <!-- BARRA SUPERIOR -->
+  <header class="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- LOGO -->
+      <button type="button" id="logoHomeBtn" class="flex items-center gap-2.5 cursor-pointer group focus:outline-none">
+        <div class="w-9 h-9 rounded-lg bg-rose-600 flex items-center justify-center shadow-sm group-hover:bg-rose-500 transition-colors">
+          <i class="ph-fill ph-play text-lg text-white ml-0.5"></i>
+        </div>
+        <span class="text-lg font-bold tracking-tight text-white">
+          CatálogoDaniel
+        </span>
+      </button>
+
+      <!-- BUSCADOR -->
+      <div id="searchWrapper" class="hidden order-3 sm:order-2 w-full sm:w-auto sm:flex-1 sm:max-w-md relative items-center">
+        <i class="ph ph-magnifying-glass text-base text-zinc-400 absolute left-3.5 pointer-events-none"></i>
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Buscar título..." 
+          class="w-full bg-zinc-950 border border-zinc-800 focus:border-zinc-600 rounded-lg pl-9 pr-8 py-2 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none transition-colors"
+        >
+        <button type="button" id="clearSearchBtn" title="Limpiar búsqueda" class="hidden absolute right-2.5 text-zinc-400 hover:text-white cursor-pointer p-0.5">
+          <i class="ph ph-x text-base"></i>
+        </button>
+      </div>
+
+      <!-- ACCIONES -->
+      <div class="order-2 sm:order-3 flex items-center gap-2">
+        <input type="file" id="importExcelFile" accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" class="hidden">
+        <button type="button" id="triggerImportExcelBtn" title="Importar Excel (.xlsx, .xls, .csv)" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-emerald-400 rounded-lg border border-zinc-700 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-semibold">
+          <i class="ph-duotone ph-file-xls text-base"></i>
+          <span class="hidden sm:inline">Excel</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-grow w-full flex flex-col">
+
+    <!-- 1. INICIO (CRISTAL TRANSLÚCIDO 3D CON BORDE NEÓN) -->
+    <section id="homeHubView" class="relative w-full min-h-[calc(100vh-4.5rem)] flex-grow flex flex-col items-center justify-center py-10 sm:py-14 px-4 sm:px-8 gap-10 sm:gap-14 overflow-hidden">
+      <!-- FONDO DE PANTALLA -->
+      <img 
+        id="homeWallpaperImg" 
+        src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600&auto=format&fit=crop&q=80" 
+        alt="Fondo de pantalla del catálogo" 
+        class="absolute inset-0 w-full h-full object-cover opacity-75 scale-105 transition-all duration-700 pointer-events-none select-none"
+      >
+      <div class="absolute inset-0 bg-gradient-to-b from-zinc-950/45 via-zinc-950/20 to-zinc-950/60 pointer-events-none"></div>
+
+      <!-- ENCABEZADO -->
+      <div class="relative z-10 text-center max-w-2xl">
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight drop-shadow-lg">Bienvenido a CatálogoDaniel</h1>
+        <p class="text-sm sm:text-base text-zinc-100 mt-2 drop-shadow-md">Selecciona una categoría para explorar tu contenido</p>
+      </div>
+
+      <!-- ACCESOS DIRECTOS DE CATEGORÍAS EN CRISTAL NEÓN 3D -->
+      <div class="relative z-10 flex flex-wrap items-center justify-center gap-7 sm:gap-10 max-w-6xl w-full">
+        
+        <!-- PELÍCULAS -->
+        <button type="button" data-category="peliculas" class="big-bubble-btn group flex flex-col items-center gap-5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-peliculas">
+            <div class="neon-glass-card w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center p-5">
+              <svg viewBox="0 0 64 64" fill="none" stroke="var(--neon-stroke)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="w-20 h-20 sm:w-24 sm:h-24 neon-svg-glow">
+                <rect x="10" y="24" width="32" height="22" rx="4"/>
+                <path d="M42 30l12-6v22l-12-6"/>
+                <circle cx="20" cy="16" r="7"/>
+                <circle cx="34" cy="17" r="6"/>
+                <circle cx="20" cy="16" r="2"/>
+                <circle cx="34" cy="17" r="1.8"/>
+                <line x1="16" y1="31" x2="26" y2="31"/>
+                <line x1="16" y1="36" x2="26" y2="36"/>
+                <line x1="16" y1="41" x2="22" y2="41"/>
+                <line x1="16" y1="46" x2="14" y2="52"/>
+                <line x1="36" y1="46" x2="38" y2="52"/>
+              </svg>
+            </div>
+          </div>
+          <span class="text-lg sm:text-xl font-extrabold text-white tracking-wide drop-shadow-md">Películas</span>
+        </button>
+
+        <!-- SERIES -->
+        <button type="button" data-category="series" class="big-bubble-btn group flex flex-col items-center gap-5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-series">
+            <div class="neon-glass-card w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center p-5">
+              <svg viewBox="0 0 64 64" fill="none" stroke="var(--neon-stroke)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="w-20 h-20 sm:w-24 sm:h-24 neon-svg-glow">
+                <rect x="20" y="14" width="24" height="16" rx="3"/>
+                <polyline points="26 8 32 14 38 8"/>
+                <rect x="10" y="33" width="24" height="18" rx="3"/>
+                <polygon points="19,38 19,46 26,42"/>
+                <rect x="37" y="35" width="17" height="16" rx="2.5"/>
+                <line x1="41" y1="40" x2="50" y2="40"/>
+                <line x1="41" y1="45" x2="48" y2="45"/>
+              </svg>
+            </div>
+          </div>
+          <span class="text-lg sm:text-xl font-extrabold text-white tracking-wide drop-shadow-md">Series</span>
+        </button>
+
+        <!-- NOVELAS -->
+        <button type="button" data-category="novelas" class="big-bubble-btn group flex flex-col items-center gap-5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-novelas">
+            <div class="neon-glass-card w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center p-5">
+              <svg viewBox="0 0 64 64" fill="none" stroke="var(--neon-stroke)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="w-20 h-20 sm:w-24 sm:h-24 neon-svg-glow">
+                <path d="M32 18c-5-4-13-5-20-3v32c7-2 15-1 20 3"/>
+                <path d="M32 18c5-4 13-5 20-3v32c-7-2-15-1-20 3"/>
+                <line x1="32" y1="18" x2="32" y2="50"/>
+                <circle cx="19" cy="27" r="3"/>
+                <circle cx="25" cy="28" r="2.5"/>
+                <path d="M15 37c1.5-3 6.5-3 8 0"/>
+                <path d="M42 25c0-3 4-4 4 0 0 3-4 5-4 5s-4-2-4-5c0-4 4-3 4 0z"/>
+                <line x1="42" y1="30" x2="42" y2="41"/>
+                <path d="M42 35l4-2"/>
+              </svg>
+            </div>
+          </div>
+          <span class="text-lg sm:text-xl font-extrabold text-white tracking-wide drop-shadow-md">Novelas</span>
+        </button>
+
+        <!-- ANIMADOS -->
+        <button type="button" data-category="animados" class="big-bubble-btn group flex flex-col items-center gap-5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-animados">
+            <div class="neon-glass-card w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center p-5">
+              <svg viewBox="0 0 64 64" fill="none" stroke="var(--neon-stroke)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="w-20 h-20 sm:w-24 sm:h-24 neon-svg-glow">
+                <path d="M10 26c12-10 32 10 44 0v18c-12 10-32-10-44 0V26z"/>
+                <line x1="24" y1="22" x2="24" y2="40"/>
+                <line x1="40" y1="28" x2="40" y2="46"/>
+                <path d="M18 14l1.5 3.5L23 19l-3.5 1.5L18 24l-1.5-3.5L13 19l3.5-1.5z"/>
+                <path d="M48 44l1.2 2.8L52 48l-2.8 1.2L48 52l-1.2-2.8L44 48l2.8-1.2z"/>
+                <circle cx="32" cy="34" r="3"/>
+              </svg>
+            </div>
+          </div>
+          <span class="text-lg sm:text-xl font-extrabold text-white tracking-wide drop-shadow-md">Animados</span>
+        </button>
+
+        <!-- MANGA -->
+        <button type="button" data-category="manga" class="big-bubble-btn group flex flex-col items-center gap-5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-manga">
+            <div class="neon-glass-card w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center p-5">
+              <svg viewBox="0 0 64 64" fill="none" stroke="var(--neon-stroke)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="w-20 h-20 sm:w-24 sm:h-24 neon-svg-glow">
+                <path d="M32 16c-5-3.5-13-4.5-20-2.5v34c7-2 15-1 20 2.5"/>
+                <path d="M32 16c5-3.5 13-4.5 20-2.5v34c-7-2-15-1-20 2.5"/>
+                <line x1="32" y1="16" x2="32" y2="50"/>
+                <rect x="17" y="21" width="10" height="20" rx="1.5"/>
+                <line x1="20" y1="26" x2="24" y2="26"/>
+                <line x1="20" y1="31" x2="24" y2="31"/>
+                <line x1="20" y1="36" x2="24" y2="36"/>
+                <path d="M46 21l-7 14-1 5 5-1 7-14z"/>
+              </svg>
+            </div>
+          </div>
+          <span class="text-lg sm:text-xl font-extrabold text-white tracking-wide drop-shadow-md">Manga</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- 2. SUBMENÚ DE GÉNEROS DE PELÍCULAS (CRISTAL NEÓN CON IMÁGENES DE PELÍCULAS DENTRO) -->
+    <section id="movieGenresHubView" class="relative hidden flex-grow flex-col items-center justify-center w-full min-h-[calc(100vh-4.5rem)] py-8 sm:py-12 px-4 sm:px-8 gap-8 sm:gap-10 overflow-hidden">
+      <img 
+        id="genresWallpaperImg" 
+        src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1600&auto=format&fit=crop&q=80" 
+        alt="Fondo de géneros de películas" 
+        class="absolute inset-0 w-full h-full object-cover opacity-75 scale-105 transition-all duration-700 pointer-events-none select-none"
+      >
+      <div class="absolute inset-0 bg-gradient-to-b from-zinc-950/45 via-zinc-950/20 to-zinc-950/60 pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col items-center gap-3 text-center max-w-lg">
+        <button type="button" class="back-home-btn px-4 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 flex items-center gap-1.5 cursor-pointer transition-colors">
+          <i class="ph ph-arrow-left text-sm"></i>
+          <span>Volver al Menú</span>
+        </button>
+        <h2 class="text-2xl sm:text-4xl font-bold tracking-tight text-white drop-shadow-md">Películas · Variedad de Géneros</h2>
+      </div>
+
+      <div class="relative z-10 flex flex-wrap items-center justify-center gap-7 sm:gap-9 max-w-5xl w-full">
+        
+        <!-- ACCIÓN -->
+        <button type="button" data-genre="accion" class="big-genre-btn group flex flex-col items-center gap-3.5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-novelas">
+            <div class="neon-glass-card w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+              <img id="genre-icon-img-accion" data-default-src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&auto=format&fit=crop&q=75" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&auto=format&fit=crop&q=75" alt="Acción" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/45 via-transparent to-zinc-950/15"></div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-base sm:text-lg font-bold text-white drop-shadow-md">Acción</span>
+            <span id="genre-count-accion" class="text-[11px] font-mono text-zinc-100 mt-0.5 drop-shadow">0 títulos</span>
+          </div>
+        </button>
+
+        <!-- COMANDO -->
+        <button type="button" data-genre="comando" class="big-genre-btn group flex flex-col items-center gap-3.5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-orange">
+            <div class="neon-glass-card w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+              <img id="genre-icon-img-comando" data-default-src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&auto=format&fit=crop&q=75" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&auto=format&fit=crop&q=75" alt="Comando" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/45 via-transparent to-zinc-950/15"></div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-base sm:text-lg font-bold text-white drop-shadow-md">Comando</span>
+            <span id="genre-count-comando" class="text-[11px] font-mono text-zinc-100 mt-0.5 drop-shadow">0 títulos</span>
+          </div>
+        </button>
+
+        <!-- COMEDIA -->
+        <button type="button" data-genre="comedia" class="big-genre-btn group flex flex-col items-center gap-3.5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-animados">
+            <div class="neon-glass-card w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+              <img id="genre-icon-img-comedia" data-default-src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=75" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=75" alt="Comedia" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/45 via-transparent to-zinc-950/15"></div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-base sm:text-lg font-bold text-white drop-shadow-md">Comedia</span>
+            <span id="genre-count-comedia" class="text-[11px] font-mono text-zinc-100 mt-0.5 drop-shadow">0 títulos</span>
+          </div>
+        </button>
+
+        <!-- DRAMA -->
+        <button type="button" data-genre="drama" class="big-genre-btn group flex flex-col items-center gap-3.5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-sky">
+            <div class="neon-glass-card w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+              <img id="genre-icon-img-drama" data-default-src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&auto=format&fit=crop&q=75" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&auto=format&fit=crop&q=75" alt="Drama" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/45 via-transparent to-zinc-950/15"></div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-base sm:text-lg font-bold text-white drop-shadow-md">Drama</span>
+            <span id="genre-count-drama" class="text-[11px] font-mono text-zinc-100 mt-0.5 drop-shadow">0 títulos</span>
+          </div>
+        </button>
+
+        <!-- TERROR -->
+        <button type="button" data-genre="terror" class="big-genre-btn group flex flex-col items-center gap-3.5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-purple">
+            <div class="neon-glass-card w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+              <img id="genre-icon-img-terror" data-default-src="https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=600&auto=format&fit=crop&q=75" src="https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=600&auto=format&fit=crop&q=75" alt="Terror" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/45 via-transparent to-zinc-950/15"></div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-base sm:text-lg font-bold text-white drop-shadow-md">Terror</span>
+            <span id="genre-count-terror" class="text-[11px] font-mono text-zinc-100 mt-0.5 drop-shadow">0 títulos</span>
+          </div>
+        </button>
+
+        <!-- CIENCIA FICCIÓN -->
+        <button type="button" data-genre="ciencia-ficcion" class="big-genre-btn group flex flex-col items-center gap-3.5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-series">
+            <div class="neon-glass-card w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+              <img id="genre-icon-img-ciencia-ficcion" data-default-src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=75" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=75" alt="Ciencia Ficción" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/45 via-transparent to-zinc-950/15"></div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-base sm:text-lg font-bold text-white drop-shadow-md">Ciencia Ficción</span>
+            <span id="genre-count-ciencia-ficcion" class="text-[11px] font-mono text-zinc-100 mt-0.5 drop-shadow">0 títulos</span>
+          </div>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- 3. SUBMENÚ DE PAÍSES DE NOVELAS (CRISTAL NEÓN CON IMÁGENES DE NOVELAS DENTRO) -->
+    <section id="novelsCountriesHubView" class="relative hidden flex-grow flex-col items-center justify-center w-full min-h-[calc(100vh-4.5rem)] py-8 sm:py-12 px-4 sm:px-8 gap-8 sm:gap-10 overflow-hidden">
+      <img 
+        id="countriesWallpaperImg" 
+        src="https://images.unsplash.com/photo-1516541196182-6bdb0516ed27?w=1600&auto=format&fit=crop&q=80" 
+        alt="Fondo de países de novelas" 
+        class="absolute inset-0 w-full h-full object-cover opacity-75 scale-105 transition-all duration-700 pointer-events-none select-none"
+      >
+      <div class="absolute inset-0 bg-gradient-to-b from-zinc-950/45 via-zinc-950/20 to-zinc-950/60 pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col items-center gap-3 text-center max-w-lg">
+        <button type="button" class="back-home-btn px-4 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 flex items-center gap-1.5 cursor-pointer transition-colors">
+          <i class="ph ph-arrow-left text-sm"></i>
+          <span>Volver al Menú</span>
+        </button>
+        <h2 class="text-2xl sm:text-4xl font-bold tracking-tight text-white drop-shadow-md">Novelas · Variedad de Países</h2>
+      </div>
+
+      <div class="relative z-10 flex flex-wrap items-center justify-center gap-7 sm:gap-9 max-w-4xl w-full">
+        
+        <!-- BRASIL -->
+        <button type="button" data-country="brasil" class="big-country-btn group flex flex-col items-center gap-3.5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-series">
+            <div class="neon-glass-card w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+              <img id="country-icon-img-brasil" data-default-src="https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=600&auto=format&fit=crop&q=75" src="https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=600&auto=format&fit=crop&q=75" alt="Brasil" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/45 via-transparent to-zinc-950/15"></div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-base sm:text-lg font-bold text-white drop-shadow-md">Brasil</span>
+            <span id="country-count-brasil" class="text-[11px] font-mono text-zinc-100 mt-0.5 drop-shadow">0 títulos</span>
+          </div>
+        </button>
+
+        <!-- MÉXICO -->
+        <button type="button" data-country="mexico" class="big-country-btn group flex flex-col items-center gap-3.5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-animados">
+            <div class="neon-glass-card w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+              <img id="country-icon-img-mexico" data-default-src="https://images.unsplash.com/photo-1518638150340-f706e86654de?w=600&auto=format&fit=crop&q=75" src="https://images.unsplash.com/photo-1518638150340-f706e86654de?w=600&auto=format&fit=crop&q=75" alt="México" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/45 via-transparent to-zinc-950/15"></div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-base sm:text-lg font-bold text-white drop-shadow-md">México</span>
+            <span id="country-count-mexico" class="text-[11px] font-mono text-zinc-100 mt-0.5 drop-shadow">0 títulos</span>
+          </div>
+        </button>
+
+        <!-- COLOMBIA -->
+        <button type="button" data-country="colombia" class="big-country-btn group flex flex-col items-center gap-3.5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-yellow">
+            <div class="neon-glass-card w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+              <img id="country-icon-img-colombia" data-default-src="https://images.unsplash.com/photo-1536323760109-ca8c07450055?w=600&auto=format&fit=crop&q=75" src="https://images.unsplash.com/photo-1536323760109-ca8c07450055?w=600&auto=format&fit=crop&q=75" alt="Colombia" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/45 via-transparent to-zinc-950/15"></div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-base sm:text-lg font-bold text-white drop-shadow-md">Colombia</span>
+            <span id="country-count-colombia" class="text-[11px] font-mono text-zinc-100 mt-0.5 drop-shadow">0 títulos</span>
+          </div>
+        </button>
+
+        <!-- TURCA -->
+        <button type="button" data-country="turca" class="big-country-btn group flex flex-col items-center gap-3.5 active:scale-95 transition-transform cursor-pointer focus:outline-none">
+          <div class="neon-glass-wrap neon-novelas">
+            <div class="neon-glass-card w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+              <img id="country-icon-img-turca" data-default-src="https://images.unsplash.com/photo-1524231757912-217feae3a89a?w=600&auto=format&fit=crop&q=75" src="https://images.unsplash.com/photo-1524231757912-217feae3a89a?w=600&auto=format&fit=crop&q=75" alt="Turca" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/45 via-transparent to-zinc-950/15"></div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-base sm:text-lg font-bold text-white drop-shadow-md">Turca</span>
+            <span id="country-count-turca" class="text-[11px] font-mono text-zinc-100 mt-0.5 drop-shadow">0 títulos</span>
+          </div>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- 4. VISTA DE CONTENIDO -->
+    <div id="categoryContentView" class="relative hidden flex-col gap-6 w-full min-h-[calc(100vh-4.5rem)] py-8 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <img 
+        id="categoryWallpaperImg" 
+        src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600&auto=format&fit=crop&q=80" 
+        alt="Fondo de categoría" 
+        class="absolute inset-0 w-full h-full object-cover opacity-70 scale-105 transition-all duration-700 pointer-events-none select-none"
+      >
+      <div class="absolute inset-0 bg-gradient-to-b from-zinc-950/50 via-zinc-950/30 to-zinc-950/65 pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-7xl mx-auto w-full flex flex-col gap-6">
+        <section class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-4">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button type="button" class="back-home-btn px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 flex items-center gap-1.5 cursor-pointer transition-colors">
+              <i class="ph ph-arrow-left text-base"></i>
+              <span>Menú</span>
+            </button>
+
+            <button type="button" id="backToGenresBtn" class="hidden px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 items-center gap-1.5 cursor-pointer transition-colors">
+              <i class="ph-duotone ph-film-slate text-base"></i>
+              <span>Géneros</span>
+            </button>
+
+            <button type="button" id="backToCountriesBtn" class="hidden px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 items-center gap-1.5 cursor-pointer transition-colors">
+              <i class="ph-duotone ph-globe text-base"></i>
+              <span>Países</span>
+            </button>
+
+            <h2 id="sectionTitle" class="text-xl sm:text-2xl font-bold tracking-tight text-white ml-1 drop-shadow">Películas</h2>
+          </div>
+
+          <div id="itemCount" class="text-xs font-mono bg-zinc-900 px-3.5 py-1.5 rounded-lg border border-zinc-800 text-zinc-400">0 elementos</div>
+        </section>
+
+        <section>
+          <div id="mediaGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL DE CONTRASEÑA PARA EXCEL -->
+  <div id="passwordModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 w-full max-w-sm rounded-2xl shadow-xl overflow-hidden flex flex-col p-6 space-y-4">
+      <h3 class="text-base font-bold text-white flex items-center gap-2">
+        <i class="ph-duotone ph-lock-key text-xl text-emerald-400"></i>
+        <span>Acceso Requerido</span>
+      </h3>
+      <p class="text-xs text-zinc-400">Introduce la contraseña de administrador para importar tu archivo Excel:</p>
+      <input type="password" id="modalPasswordInput" placeholder="Contraseña..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-zinc-600">
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button type="button" id="cancelPasswordModal" class="px-4 py-2 bg-zinc-800 text-zinc-300 text-xs font-semibold rounded-lg cursor-pointer">Cancelar</button>
+        <button type="button" id="confirmPasswordModal" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg cursor-pointer">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE INFORMACIÓN -->
+  <div id="infoModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 w-full max-w-lg rounded-2xl shadow-xl overflow-hidden flex flex-col">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="ph-duotone ph-info text-xl text-sky-400"></i>
+          <span id="infoModalTitle">Información</span>
+        </h3>
+        <button type="button" id="closeInfoModal" class="text-zinc-400 hover:text-white cursor-pointer"><i class="ph ph-x text-xl"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div id="infoModalMeta" class="text-xs font-mono text-zinc-400 bg-zinc-950 border border-zinc-800/80 rounded-xl px-3.5 py-2 hidden"></div>
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 mb-2">Sinopsis / ¿De qué trata?</label>
+          <textarea id="infoModalText" rows="6" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-zinc-100 leading-relaxed focus:outline-none focus:border-zinc-600"></textarea>
+        </div>
+        <div class="pt-3 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-800">
+          <button type="button" id="fetchInfoBtn" class="px-3.5 py-2 bg-zinc-800 hover:bg-zinc-700 text-sky-300 text-xs font-semibold rounded-lg cursor-pointer">
+            🔄 Buscar sinopsis automática
+          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" id="cancelInfoBtn" class="px-4 py-2 bg-zinc-800 text-zinc-300 text-xs font-semibold rounded-lg cursor-pointer">Cerrar</button>
+            <button type="button" id="saveInfoBtn" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-lg cursor-pointer">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const categoryNames = {
+      peliculas: "Película",
+      series: "Serie",
+      novelas: "Novela",
+      animados: "Animado",
+      manga: "Manga"
+    };
+
+    const categoryTitles = {
+      peliculas: "Películas",
+      series: "Series",
+      novelas: "Novelas",
+      animados: "Animados",
+      manga: "Manga"
+    };
+
+    const genreLabels = {
+      accion: "Acción",
+      comando: "Comando",
+      comedia: "Comedia",
+      drama: "Drama",
+      terror: "Terror",
+      "ciencia-ficcion": "Ciencia Ficción"
+    };
+
+    const countryLabels = {
+      brasil: "Brasil",
+      mexico: "México",
+      colombia: "Colombia",
+      turca: "Turca"
+    };
+
+    const ADMIN_PASSWORD = "Daniel951003*";
+    const DELETED_KEYS_STORAGE = 'mediaHubDeletedKeys';
+    const imageCache = new Map();
+    const infoCache = new Map();
+
+    function ensureXlsxLoaded() {
+      return new Promise((resolve, reject) => {
+        if (typeof XLSX !== 'undefined') {
+          resolve(true);
+          return;
+        }
+        const fallbackSrcs = [
+          'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
+          'https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js'
+        ];
+        let idx = 0;
+        function tryNext() {
+          if (typeof XLSX !== 'undefined') {
+            resolve(true);
+            return;
+          }
+          if (idx >= fallbackSrcs.length) {
+            reject(new Error('No se pudo cargar la librería para leer archivos Excel. Revisa tu conexión a internet o bloqueadores.'));
+            return;
+          }
+          const s = document.createElement('script');
+          s.src = fallbackSrcs[idx++];
+          s.onload = () => resolve(true);
+          s.onerror = tryNext;
+          document.head.appendChild(s);
+        }
+        tryNext();
+      });
+    }
+
+    function requireAdminPassword() {
+      const pass = prompt("Introduce la contraseña:");
+      if (pass === null) return false;
+      if (pass !== ADMIN_PASSWORD) {
+        alert("Contraseña incorrecta.");
+        return false;
+      }
+      return true;
+    }
+
+    function normalizeText(str) {
+      return String(str || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function getItemKey(category, title) {
+      return `${category || 'peliculas'}:${normalizeText(title)}`;
+    }
+
+    function loadDeletedKeys() {
+      try {
+        const raw = localStorage.getItem(DELETED_KEYS_STORAGE);
+        if (!raw) return new Set();
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? new Set(arr) : new Set();
+      } catch {
+        return new Set();
+      }
+    }
+
+    let deletedKeys = loadDeletedKeys();
+
+    function saveDeletedKeys() {
+      try {
+        localStorage.setItem(DELETED_KEYS_STORAGE, JSON.stringify(Array.from(deletedKeys)));
+      } catch {}
+    }
+
+    function isTitleRelevant(queryTitle, candidateTitle) {
+      const q = normalizeText(queryTitle);
+      const c = normalizeText(candidateTitle);
+      if (!q || !c) return false;
+      if (q === c || c.includes(q) || q.includes(c)) return true;
+
+      const stopWords = new Set(['el', 'la', 'los', 'las', 'un', 'una', 'de', 'del', 'y', 'a', 'en', 'the', 'of', 'and', 'pelicula', 'film', 'movie', 'serie', 'manga', 'telenovela']);
+      const qTokens = q.split(' ').filter(w => w.length > 1 && !stopWords.has(w));
+      const cTokens = new Set(c.split(' ').filter(w => w.length > 1 && !stopWords.has(w)));
+      if (qTokens.length === 0) return false;
+
+      let matches = 0;
+      qTokens.forEach(t => {
+        if (cTokens.has(t)) matches++;
+      });
+      return matches / qTokens.length >= 0.6;
+    }
+
+    function buildTopicSvgPlaceholder(item) {
+      const title = String(item?.title || 'CatálogoDaniel').trim();
+      const subtitle = item?.genre
+        ? `${item.type || ''} · ${genreLabels[item.genre] || item.genre}`
+        : item?.country
+        ? `${item.type || ''} · ${countryLabels[item.country] || item.country}`
+        : String(item?.type || 'Catálogo');
+      const safeTitle = title.slice(0, 26).replace(/[<>&"]/g, '');
+      const safeSub = subtitle.slice(0, 28).replace(/[<>&"]/g, '');
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="533" viewBox="0 0 400 533">
+        <rect width="400" height="533" fill="#18181b"/>
+        <circle cx="200" cy="210" r="78" fill="#27272a"/>
+        <text x="200" y="220" text-anchor="middle" fill="#e4e4e7" font-family="sans-serif" font-size="44" font-weight="bold">${(safeTitle[0] || 'C').toUpperCase()}</text>
+        <text x="200" y="330" text-anchor="middle" fill="#f4f4f5" font-family="sans-serif" font-size="22" font-weight="bold">${safeTitle}</text>
+        <text x="200" y="365" text-anchor="middle" fill="#a1a1aa" font-family="sans-serif" font-size="14">${safeSub}</text>
+      </svg>`;
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    }
+
+    function normalizeRecord(item) {
+      const cat = item?.category || 'peliculas';
+      return {
+        id: item?.id || ('id_' + Date.now() + '_' + Math.random().toString(36).slice(2)),
+        title: String(item?.title || '').trim(),
+        year: String(item?.year || '').trim(),
+        category: cat,
+        type: item?.type || categoryNames[cat] || 'Película',
+        genre: cat === 'peliculas' ? (item?.genre || null) : null,
+        country: cat === 'novelas' ? (item?.country || null) : null,
+        image: String(item?.image || '').trim(),
+        info: String(item?.info || '').trim()
+      };
+    }
+
+    function loadInitialData() {
+      try {
+        const raw = localStorage.getItem('mediaHubData');
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+          .map(normalizeRecord)
+          .filter(item => item.title && !deletedKeys.has(getItemKey(item.category, item.title)));
+      } catch {
+        return [];
+      }
+    }
+
+    let mediaData = loadInitialData();
+    let currentCategory = null;
+    let currentGenre = null;
+    let currentCountry = null;
+    let searchQuery = '';
+    let activeInfoId = null;
+
+    const CATEGORY_DEFAULT_WALLPAPERS = {
+      peliculas: [{ src: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600&auto=format&fit=crop&q=80', title: 'Películas' }],
+      series: [{ src: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=1600&auto=format&fit=crop&q=80', title: 'Series' }],
+      novelas: [{ src: 'https://images.unsplash.com/photo-1516541196182-6bdb0516ed27?w=1600&auto=format&fit=crop&q=80', title: 'Novelas' }],
+      animados: [{ src: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1600&auto=format&fit=crop&q=80', title: 'Animados' }],
+      manga: [{ src: 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=1600&auto=format&fit=crop&q=80', title: 'Manga' }]
+    };
+
+    const DEFAULT_WALLPAPERS = [
+      ...CATEGORY_DEFAULT_WALLPAPERS.peliculas,
+      ...CATEGORY_DEFAULT_WALLPAPERS.series,
+      ...CATEGORY_DEFAULT_WALLPAPERS.animados,
+      ...CATEGORY_DEFAULT_WALLPAPERS.manga
+    ];
+
+    let wallpaperIndex = 0;
+    let wallpaperTimer = null;
+
+    const homeHubView = document.getElementById('homeHubView');
+    const homeWallpaperImg = document.getElementById('homeWallpaperImg');
+    const genresWallpaperImg = document.getElementById('genresWallpaperImg');
+    const countriesWallpaperImg = document.getElementById('countriesWallpaperImg');
+    const categoryWallpaperImg = document.getElementById('categoryWallpaperImg');
+    const movieGenresHubView = document.getElementById('movieGenresHubView');
+    const novelsCountriesHubView = document.getElementById('novelsCountriesHubView');
+    const categoryContentView = document.getElementById('categoryContentView');
+    const searchWrapper = document.getElementById('searchWrapper');
+    const backToGenresBtn = document.getElementById('backToGenresBtn');
+    const backToCountriesBtn = document.getElementById('backToCountriesBtn');
+
+    const mediaGrid = document.getElementById('mediaGrid');
+    const itemCount = document.getElementById('itemCount');
+    const sectionTitle = document.getElementById('sectionTitle');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+    const infoModal = document.getElementById('infoModal');
+    const infoModalTitle = document.getElementById('infoModalTitle');
+    const infoModalMeta = document.getElementById('infoModalMeta');
+    const infoModalText = document.getElementById('infoModalText');
+
+    const passwordModal = document.getElementById('passwordModal');
+    const modalPasswordInput = document.getElementById('modalPasswordInput');
+
+    function escapeAttr(str) {
+      return String(str).replace(/"/g, '&quot;');
+    }
+
+    function getCategoryImagesPool(category, genre = null, country = null) {
+      let items = mediaData.filter(i => i && i.category === category && i.title && i.image);
+      if (category === 'peliculas' && genre) {
+        const byGenre = items.filter(i => i.genre === genre);
+        if (byGenre.length > 0) items = byGenre;
+      }
+      if (category === 'novelas' && country) {
+        const byCountry = items.filter(i => i.country === country);
+        if (byCountry.length > 0) items = byCountry;
+      }
+      return items.map(i => ({ src: i.image, title: i.title }));
+    }
+
+    function updateSubmenuIconImages() {
+      Object.keys(genreLabels).forEach((genre, idx) => {
+        const imgEl = document.getElementById(`genre-icon-img-${genre}`);
+        if (!imgEl) return;
+        const defaultSrc = imgEl.getAttribute('data-default-src') || imgEl.src;
+        const matches = mediaData.filter(i => i.category === 'peliculas' && i.genre === genre && i.image);
+        if (matches.length > 0) {
+          const picked = matches[(wallpaperIndex + idx) % matches.length];
+          imgEl.onerror = function() {
+            this.onerror = null;
+            this.src = defaultSrc;
+          };
+          imgEl.src = picked.image;
+          imgEl.alt = `${genreLabels[genre]} - ${picked.title}`;
+        } else {
+          imgEl.onerror = null;
+          imgEl.src = defaultSrc;
+          imgEl.alt = genreLabels[genre];
+        }
+      });
+
+      Object.keys(countryLabels).forEach((country, idx) => {
+        const imgEl = document.getElementById(`country-icon-img-${country}`);
+        if (!imgEl) return;
+        const defaultSrc = imgEl.getAttribute('data-default-src') || imgEl.src;
+        const matches = mediaData.filter(i => i.category === 'novelas' && i.country === country && i.image);
+        if (matches.length > 0) {
+          const picked = matches[(wallpaperIndex + idx) % matches.length];
+          imgEl.onerror = function() {
+            this.onerror = null;
+            this.src = defaultSrc;
+          };
+          imgEl.src = picked.image;
+          imgEl.alt = `${countryLabels[country]} - ${picked.title}`;
+        } else {
+          imgEl.onerror = null;
+          imgEl.src = defaultSrc;
+          imgEl.alt = countryLabels[country];
+        }
+      });
+    }
+
+    function getActiveWallpaperConfig() {
+      if (!homeHubView.classList.contains('hidden')) {
+        const allWithImg = mediaData.filter(i => i && i.title && i.image);
+        return {
+          imgEl: homeWallpaperImg,
+          items: allWithImg.map(i => ({ src: i.image, title: i.title })),
+          fallbackPool: DEFAULT_WALLPAPERS
+        };
+      }
+
+      if (!movieGenresHubView.classList.contains('hidden')) {
+        return {
+          imgEl: genresWallpaperImg,
+          items: getCategoryImagesPool('peliculas'),
+          fallbackPool: CATEGORY_DEFAULT_WALLPAPERS.peliculas
+        };
+      }
+
+      if (!novelsCountriesHubView.classList.contains('hidden')) {
+        return {
+          imgEl: countriesWallpaperImg,
+          items: getCategoryImagesPool('novelas'),
+          fallbackPool: CATEGORY_DEFAULT_WALLPAPERS.novelas
+        };
+      }
+
+      if (!categoryContentView.classList.contains('hidden') && currentCategory) {
+        return {
+          imgEl: categoryWallpaperImg,
+          items: getCategoryImagesPool(currentCategory, currentGenre, currentCountry),
+          fallbackPool: CATEGORY_DEFAULT_WALLPAPERS[currentCategory] || DEFAULT_WALLPAPERS
+        };
+      }
+
+      return { imgEl: null, items: [], fallbackPool: DEFAULT_WALLPAPERS };
+    }
+
+    function applyActiveWallpaper(stepIndex = wallpaperIndex) {
+      const { imgEl, items, fallbackPool } = getActiveWallpaperConfig();
+      if (!imgEl) return;
+
+      const pool = items.length > 0 ? items : fallbackPool;
+      wallpaperIndex = ((stepIndex % pool.length) + pool.length) % pool.length;
+      const current = pool[wallpaperIndex];
+
+      imgEl.onerror = function() {
+        this.onerror = null;
+        const fallback = fallbackPool[wallpaperIndex % fallbackPool.length];
+        this.src = fallback.src;
+      };
+      imgEl.src = current.src;
+      imgEl.alt = current.title;
+      updateSubmenuIconImages();
+    }
+
+    function startWallpaperSlideshow() {
+      stopWallpaperSlideshow();
+      applyActiveWallpaper(wallpaperIndex);
+      wallpaperTimer = setInterval(() => {
+        wallpaperIndex += 1;
+        applyActiveWallpaper(wallpaperIndex);
+      }, 5000);
+    }
+
+    function stopWallpaperSlideshow() {
+      if (wallpaperTimer) {
+        clearInterval(wallpaperTimer);
+        wallpaperTimer = null;
+      }
+    }
+
+    async function fetchWikiData(query, expectedTitle, lang = 'es') {
+      try {
+        const searchUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=5&prop=pageimages|extracts&exintro=1&explaintext=1&pithumbsize=600&format=json&origin=*`;
+        const res = await fetch(searchUrl);
+        if (!res.ok) return null;
+        const data = await res.json();
+        const pages = data?.query?.pages;
+        if (!pages) return null;
+
+        const pageList = Object.values(pages);
+        const matchedPage =
+          pageList.find(p => p?.thumbnail?.source && isTitleRelevant(expectedTitle, p?.title)) ||
+          pageList.find(p => isTitleRelevant(expectedTitle, p?.title));
+
+        if (!matchedPage) return null;
+        const rawExtract = String(matchedPage.extract || '').replace(/\s+/g, ' ').trim();
+        return {
+          image: matchedPage?.thumbnail?.source || null,
+          info: rawExtract || null
+        };
+      } catch {
+        return null;
+      }
+    }
+
+    async function fetchItunesData(query, expectedTitle, media = 'movie', entity = 'movie') {
+      try {
+        const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=${media}&entity=${entity}&limit=5`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const data = await res.json();
+        const results = Array.isArray(data?.results) ? data.results : [];
+        if (results.length === 0) return null;
+
+        const matched =
+          results.find(r => {
+            const candidate = r?.trackName || r?.collectionName || '';
+            const kindOk = media !== 'movie' || r?.kind === 'feature-movie' || r?.wrapperType === 'track';
+            return kindOk && isTitleRelevant(expectedTitle, candidate);
+          }) ||
+          results.find(r => {
+            const candidate = r?.trackName || r?.collectionName || '';
+            return isTitleRelevant(expectedTitle, candidate);
+          });
+
+        if (!matched) return null;
+        const artwork = matched?.artworkUrl100;
+        const desc = String(matched?.longDescription || matched?.shortDescription || '').replace(/\s+/g, ' ').trim();
+        return {
+          image: artwork ? artwork.replace('100x100bb', '600x600bb') : null,
+          info: desc || null
+        };
+      } catch {
+        return null;
+      }
+    }
+
+    async function fetchMangaData(query, expectedTitle) {
+      try {
+        const url = `https://api.jikan.moe/v4/manga?q=${encodeURIComponent(query)}&limit=5`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const data = await res.json();
+        const list = Array.isArray(data?.data) ? data.data : [];
+        const matched =
+          list.find(m => isTitleRelevant(expectedTitle, m?.title) || isTitleRelevant(expectedTitle, m?.title_english)) ||
+          list[0];
+        if (!matched || !isTitleRelevant(expectedTitle, matched?.title || matched?.title_english || '')) return null;
+        const syn = String(matched?.synopsis || '').replace(/\[Written by.*?\]/gi, '').replace(/\s+/g, ' ').trim();
+        return {
+          image: matched?.images?.jpg?.large_image_url || matched?.images?.jpg?.image_url || null,
+          info: syn || null
+        };
+      } catch {
+        return null;
+      }
+    }
+
+    function getFallbackInfo(item) {
+      const yearPart = item?.year ? ` (${item.year})` : '';
+      return `Trata sobre "${item.title}"${yearPart} · ${item.type}.`;
+    }
+
+    async function findImageByTitle(title, category = 'peliculas') {
+      const cleanTitle = String(title || '').trim();
+      if (!cleanTitle) return '';
+      const cacheKey = `img:${category}:${normalizeText(cleanTitle)}`;
+      if (imageCache.has(cacheKey)) return imageCache.get(cacheKey);
+
+      let found = null;
+      if (category === 'peliculas') {
+        found = (await fetchItunesData(cleanTitle, cleanTitle, 'movie', 'movie'))?.image;
+        if (!found) found = (await fetchWikiData(`${cleanTitle} pelicula`, cleanTitle, 'es'))?.image;
+        if (!found) found = (await fetchWikiData(`${cleanTitle} film`, cleanTitle, 'en'))?.image;
+        if (!found) found = (await fetchWikiData(cleanTitle, cleanTitle, 'es'))?.image;
+      } else if (category === 'manga') {
+        const m = await fetchMangaData(cleanTitle, cleanTitle);
+        found = m?.image;
+        if (!found) found = (await fetchWikiData(`${cleanTitle} manga`, cleanTitle, 'es'))?.image;
+        if (!found) found = (await fetchWikiData(`${cleanTitle} manga`, cleanTitle, 'en'))?.image;
+      } else if (category === 'novelas') {
+        found = (await fetchWikiData(`${cleanTitle} telenovela`, cleanTitle, 'es'))?.image;
+        if (!found) found = (await fetchItunesData(cleanTitle, cleanTitle, 'tvShow', 'tvSeason'))?.image;
+        if (!found) found = (await fetchWikiData(cleanTitle, cleanTitle, 'es'))?.image;
+      } else if (category === 'animados') {
+        found = (await fetchItunesData(cleanTitle, cleanTitle, 'tvShow', 'tvSeason'))?.image;
+        if (!found) found = (await fetchItunesData(cleanTitle, cleanTitle, 'movie', 'movie'))?.image;
+        if (!found) found = (await fetchWikiData(`${cleanTitle} serie animada`, cleanTitle, 'es'))?.image;
+        if (!found) found = (await fetchWikiData(`${cleanTitle} anime`, cleanTitle, 'en'))?.image;
+      } else {
+        found = (await fetchItunesData(cleanTitle, cleanTitle, 'tvShow', 'tvSeason'))?.image;
+        if (!found) found = (await fetchWikiData(`${cleanTitle} serie`, cleanTitle, 'es'))?.image;
+        if (!found) found = (await fetchWikiData(`${cleanTitle} TV series`, cleanTitle, 'en'))?.image;
+        if (!found) found = (await fetchWikiData(cleanTitle, cleanTitle, 'es'))?.image;
+      }
+
+      const finalUrl = found || '';
+      imageCache.set(cacheKey, finalUrl);
+      return finalUrl;
+    }
+
+    async function findInfoByTitle(title, category = 'peliculas') {
+      const cleanTitle = String(title || '').trim();
+      if (!cleanTitle) return { image: '', info: '' };
+      const cacheKey = `info:${category}:${normalizeText(cleanTitle)}`;
+      if (infoCache.has(cacheKey)) return infoCache.get(cacheKey);
+
+      let primary = null;
+      let secondary = null;
+      if (category === 'peliculas') {
+        primary = await fetchItunesData(cleanTitle, cleanTitle, 'movie', 'movie');
+        secondary = await fetchWikiData(`${cleanTitle} pelicula`, cleanTitle, 'es');
+      } else if (category === 'manga') {
+        primary = await fetchMangaData(cleanTitle, cleanTitle);
+        secondary = await fetchWikiData(`${cleanTitle} manga`, cleanTitle, 'es');
+      } else if (category === 'novelas') {
+        primary = await fetchWikiData(`${cleanTitle} telenovela`, cleanTitle, 'es');
+        secondary = await fetchItunesData(cleanTitle, cleanTitle, 'tvShow', 'tvSeason');
+      } else if (category === 'animados') {
+        primary = await fetchItunesData(cleanTitle, cleanTitle, 'tvShow', 'tvSeason');
+        secondary = await fetchWikiData(`${cleanTitle} serie animada`, cleanTitle, 'es');
+      } else {
+        primary = await fetchItunesData(cleanTitle, cleanTitle, 'tvShow', 'tvSeason');
+        secondary = await fetchWikiData(`${cleanTitle} serie`, cleanTitle, 'es');
+      }
+
+      const finalResult = {
+        image: primary?.image || secondary?.image || '',
+        info: primary?.info || secondary?.info || ''
+      };
+      infoCache.set(cacheKey, finalResult);
+      return finalResult;
+    }
+
+    async function importAndEnrichExcelItems(items, concurrency = 4) {
+      const pending = items.filter(i => (!i.image || !i.info) && !deletedKeys.has(getItemKey(i.category, i.title)));
+      if (pending.length === 0) return { savedImages: 0, savedInfos: 0 };
+
+      let savedImages = 0;
+      let savedInfos = 0;
+      let index = 0;
+
+      async function worker() {
+        while (index < pending.length) {
+          const current = pending[index++];
+          if (deletedKeys.has(getItemKey(current.category, current.title))) continue;
+
+          let changed = false;
+          if (!current.image) {
+            const foundUrl = await findImageByTitle(current.title, current.category);
+            if (foundUrl && !deletedKeys.has(getItemKey(current.category, current.title))) {
+              current.image = foundUrl;
+              savedImages++;
+              changed = true;
+            }
+          }
+          if (!current.info) {
+            const foundMeta = await findInfoByTitle(current.title, current.category);
+            if (foundMeta.info && !deletedKeys.has(getItemKey(current.category, current.title))) {
+              current.info = foundMeta.info;
+              savedInfos++;
+              changed = true;
+            } else if (!current.info) {
+              current.info = getFallbackInfo(current);
+              savedInfos++;
+              changed = true;
+            }
+            if (!current.image && foundMeta.image) {
+              current.image = foundMeta.image;
+              savedImages++;
+              changed = true;
+            }
+          }
+          if (changed) saveAndRender();
+        }
+      }
+
+      const workers = Array.from({ length: Math.min(concurrency, pending.length) }, () => worker());
+      await Promise.all(workers);
+      saveAndRender();
+      return { savedImages, savedInfos };
+    }
+
+    function updateHomeCounters() {
+      Object.keys(genreLabels).forEach(genre => {
+        const count = mediaData.filter(i => i.category === 'peliculas' && i.genre === genre).length;
+        const badge = document.getElementById(`genre-count-${genre}`);
+        if (badge) badge.textContent = `${count} ${count === 1 ? 'título' : 'títulos'}`;
+      });
+
+      Object.keys(countryLabels).forEach(country => {
+        const count = mediaData.filter(i => i.category === 'novelas' && i.country === country).length;
+        const badge = document.getElementById(`country-count-${country}`);
+        if (badge) badge.textContent = `${count} ${count === 1 ? 'título' : 'títulos'}`;
+      });
+
+      applyActiveWallpaper(wallpaperIndex);
+    }
+
+    function saveAndRender() {
+      mediaData = mediaData.filter(item => !deletedKeys.has(getItemKey(item.category, item.title)));
+      try {
+        localStorage.setItem('mediaHubData', JSON.stringify(mediaData));
+      } catch {}
+      updateHomeCounters();
+      if (
+        currentCategory &&
+        (currentCategory !== 'peliculas' || currentGenre) &&
+        (currentCategory !== 'novelas' || currentCountry)
+      ) {
+        applyFilters();
+      }
+    }
+
+    function hideAllViews() {
+      [homeHubView, movieGenresHubView, novelsCountriesHubView, categoryContentView].forEach(el => {
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+      });
+      searchWrapper.classList.add('hidden');
+      searchWrapper.classList.remove('flex');
+    }
+
+    function showHomeView() {
+      currentCategory = null;
+      currentGenre = null;
+      currentCountry = null;
+      searchQuery = '';
+      searchInput.value = '';
+      clearSearchBtn.classList.add('hidden');
+
+      hideAllViews();
+      homeHubView.classList.remove('hidden');
+      homeHubView.classList.add('flex');
+      wallpaperIndex = 0;
+      updateHomeCounters();
+      startWallpaperSlideshow();
+    }
+
+    function showMovieGenresView() {
+      currentCategory = 'peliculas';
+      currentGenre = null;
+      currentCountry = null;
+      searchQuery = '';
+      searchInput.value = '';
+      clearSearchBtn.classList.add('hidden');
+
+      hideAllViews();
+      movieGenresHubView.classList.remove('hidden');
+      movieGenresHubView.classList.add('flex');
+      wallpaperIndex = 0;
+      updateHomeCounters();
+      startWallpaperSlideshow();
+    }
+
+    function showNovelsCountriesView() {
+      currentCategory = 'novelas';
+      currentGenre = null;
+      currentCountry = null;
+      searchQuery = '';
+      searchInput.value = '';
+      clearSearchBtn.classList.add('hidden');
+
+      hideAllViews();
+      novelsCountriesHubView.classList.remove('hidden');
+      novelsCountriesHubView.classList.add('flex');
+      wallpaperIndex = 0;
+      updateHomeCounters();
+      startWallpaperSlideshow();
+    }
+
+    function openCategory(category, subFilter = null) {
+      if (category === 'peliculas' && !subFilter) {
+        showMovieGenresView();
+        return;
+      }
+      if (category === 'novelas' && !subFilter) {
+        showNovelsCountriesView();
+        return;
+      }
+
+      currentCategory = category;
+      currentGenre = category === 'peliculas' ? subFilter : null;
+      currentCountry = category === 'novelas' ? subFilter : null;
+      searchQuery = '';
+      searchInput.value = '';
+      clearSearchBtn.classList.add('hidden');
+
+      hideAllViews();
+      categoryContentView.classList.remove('hidden');
+      categoryContentView.classList.add('flex');
+      searchWrapper.classList.remove('hidden');
+      searchWrapper.classList.add('flex');
+
+      backToGenresBtn.classList.toggle('hidden', !(category === 'peliculas' && currentGenre));
+      backToGenresBtn.classList.toggle('flex', category === 'peliculas' && !!currentGenre);
+
+      backToCountriesBtn.classList.toggle('hidden', !(category === 'novelas' && currentCountry));
+      backToCountriesBtn.classList.toggle('flex', category === 'novelas' && !!currentCountry);
+
+      let label = categoryTitles[category];
+      if (category === 'peliculas' && currentGenre) label = `Películas · ${genreLabels[currentGenre]}`;
+      if (category === 'novelas' && currentCountry) label = `Novelas · ${countryLabels[currentCountry]}`;
+
+      sectionTitle.textContent = label;
+      searchInput.placeholder = `Buscar en ${label}...`;
+      wallpaperIndex = 0;
+      applyActiveWallpaper(0);
+      startWallpaperSlideshow();
+      applyFilters();
+    }
+
+    function renderGrid(items) {
+      mediaGrid.innerHTML = '';
+      itemCount.textContent = `${items.length} elementos`;
+
+      if (items.length === 0) {
+        mediaGrid.innerHTML = `
+          <div class="col-span-full py-16 text-center text-zinc-500 flex flex-col items-center justify-center gap-2">
+            <i class="ph-duotone ph-folder-open text-5xl text-zinc-600"></i>
+            <p class="text-sm">No hay elementos registrados aquí todavía. Importa un archivo Excel para comenzar.</p>
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach(item => {
+        const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(item.title)}`;
+        const fallbackImg = buildTopicSvgPlaceholder(item);
+        const imgSrc = item.image || fallbackImg;
+        const extraTag = item.genre
+          ? ` (${genreLabels[item.genre] || item.genre.toUpperCase()})`
+          : item.country
+          ? ` (${countryLabels[item.country] || item.country.toUpperCase()})`
+          : item.year
+          ? ` · ${item.year}`
+          : '';
+
+        const card = document.createElement('div');
+        card.className = "group bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-sm flex flex-col relative hover:border-zinc-600 transition-all duration-300";
+        card.innerHTML = `
+          <div class="absolute top-2 right-2 z-20 flex flex-wrap justify-end items-center gap-1.5 max-w-[92%]">
+            <button type="button" onclick="window.openInfoModal('${item.id}')" class="px-2 py-1 bg-zinc-950/90 hover:bg-sky-600 text-zinc-200 text-xs rounded-md border border-zinc-800 cursor-pointer">
+              ℹ️ Info
+            </button>
+            <button type="button" onclick="window.deleteItem('${item.id}')" class="px-2 py-1 bg-zinc-950/90 hover:bg-rose-600 text-zinc-200 text-xs rounded-md border border-zinc-800 cursor-pointer">
+              🗑️ Borrar
+            </button>
+          </div>
+          <a href="${googleSearchUrl}" target="_blank" rel="noopener noreferrer" class="relative aspect-[3/4] bg-zinc-950 overflow-hidden block">
+            <img src="${escapeAttr(imgSrc)}" alt="${escapeAttr(item.title)}" data-item-id="${item.id}" onerror="this.onerror=null;this.src='${escapeAttr(fallbackImg)}';window.refreshCardImageByName('${item.id}');" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <span class="absolute top-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded bg-zinc-950/85 text-zinc-200 border border-zinc-800">
+              ${item.type}${extraTag}
+            </span>
+          </a>
+          <div class="p-3 text-center bg-zinc-900 flex-grow flex items-center justify-center">
+            <a href="${googleSearchUrl}" target="_blank" rel="noopener noreferrer" class="font-semibold text-zinc-100 text-xs sm:text-sm hover:text-rose-400 transition-colors line-clamp-1">
+              ${item.title}
+            </a>
+          </div>
+        `;
+        mediaGrid.appendChild(card);
+
+        if (!item.image || !item.info) {
+          findInfoByTitle(item.title, item.category).then(found => {
+            if (!deletedKeys.has(getItemKey(item.category, item.title))) {
+              let changed = false;
+              if (!item.image && found.image) {
+                item.image = found.image;
+                const imgEl = card.querySelector('img[data-item-id]');
+                if (imgEl) imgEl.src = found.image;
+                changed = true;
+                applyActiveWallpaper(wallpaperIndex);
+              }
+              if (!item.info && found.info) {
+                item.info = found.info;
+                changed = true;
+              }
+              if (changed) {
+                try {
+                  localStorage.setItem('mediaHubData', JSON.stringify(mediaData));
+                } catch {}
+              }
+            }
+          });
+        }
+      });
+    }
+
+    window.refreshCardImageByName = async function(id) {
+      const item = mediaData.find(i => i.id === id);
+      if (!item) return;
+      imageCache.delete(`img:${item.category}:${normalizeText(item.title)}`);
+      const foundUrl = await findImageByTitle(item.title, item.category);
+      if (foundUrl && foundUrl !== item.image && !deletedKeys.has(getItemKey(item.category, item.title))) {
+        item.image = foundUrl;
+        const imgEl = document.querySelector(`img[data-item-id="${id}"]`);
+        if (imgEl) imgEl.src = foundUrl;
+        applyActiveWallpaper(wallpaperIndex);
+        try {
+          localStorage.setItem('mediaHubData', JSON.stringify(mediaData));
+        } catch {}
+      }
+    };
+
+    function applyFilters() {
+      let result = mediaData.filter(i => i.category === currentCategory);
+      if (currentCategory === 'peliculas' && currentGenre) {
+        result = result.filter(i => i.genre === currentGenre);
+      }
+      if (currentCategory === 'novelas' && currentCountry) {
+        result = result.filter(i => i.country === currentCountry);
+      }
+      if (searchQuery.trim() !== '') {
+        const q = searchQuery.toLowerCase().trim();
+        result = result.filter(i =>
+          i.title.toLowerCase().includes(q) ||
+          (i.info && i.info.toLowerCase().includes(q)) ||
+          (i.year && i.year.toLowerCase().includes(q))
+        );
+      }
+      renderGrid(result);
+    }
+
+    /* MODAL DE INFORMACIÓN */
+    window.openInfoModal = async function(id) {
+      const item = mediaData.find(i => i.id === id);
+      if (!item) return;
+      activeInfoId = item.id;
+      infoModalTitle.textContent = item.title;
+
+      const metaParts = [];
+      if (item.type) metaParts.push(item.type);
+      if (item.year) metaParts.push(`Año: ${item.year}`);
+      if (metaParts.length > 0) {
+        infoModalMeta.textContent = metaParts.join(' · ');
+        infoModalMeta.classList.remove('hidden');
+      } else {
+        infoModalMeta.textContent = '';
+        infoModalMeta.classList.add('hidden');
+      }
+
+      if (!item.info || !item.info.trim()) {
+        infoModalText.value = "Buscando sinopsis...";
+        infoModal.classList.replace('hidden', 'flex');
+        const found = await findInfoByTitle(item.title, item.category);
+        if (activeInfoId === item.id) {
+          item.info = found.info || getFallbackInfo(item);
+          if (!item.image && found.image) item.image = found.image;
+          infoModalText.value = item.info;
+          saveAndRender();
+        }
+        return;
+      }
+
+      infoModalText.value = item.info;
+      infoModal.classList.replace('hidden', 'flex');
+    };
+
+    document.getElementById('closeInfoModal').addEventListener('click', () => {
+      activeInfoId = null;
+      infoModal.classList.replace('flex', 'hidden');
+    });
+    document.getElementById('cancelInfoBtn').addEventListener('click', () => {
+      activeInfoId = null;
+      infoModal.classList.replace('flex', 'hidden');
+    });
+
+    document.getElementById('fetchInfoBtn').addEventListener('click', async () => {
+      const item = mediaData.find(i => i.id === activeInfoId);
+      if (!item) return;
+      infoCache.delete(`info:${item.category}:${normalizeText(item.title)}`);
+      infoModalText.value = "Buscando sinopsis...";
+      const found = await findInfoByTitle(item.title, item.category);
+      if (activeInfoId === item.id) {
+        item.info = found.info || getFallbackInfo(item);
+        infoModalText.value = item.info;
+        saveAndRender();
+      }
+    });
+
+    document.getElementById('saveInfoBtn').addEventListener('click', () => {
+      const item = mediaData.find(i => i.id === activeInfoId);
+      if (!item) return;
+      item.info = infoModalText.value.trim();
+      saveAndRender();
+      activeInfoId = null;
+      infoModal.classList.replace('flex', 'hidden');
+    });
+
+    function normalizeCountry(val) {
+      const clean = normalizeText(val);
+      if (clean.includes('brasil') || clean.includes('brazil')) return 'brasil';
+      if (clean.includes('colomb')) return 'colombia';
+      if (clean.includes('turc') || clean.includes('turqu')) return 'turca';
+      if (clean.includes('mexic')) return 'mexico';
+      return 'mexico';
+    }
+
+    function inferCategoryFromContext(rawCategory, hasGenre, fileName = '', sheetName = '') {
+      const combined = normalizeText(`${rawCategory} ${fileName} ${sheetName}`);
+      if (combined.includes('animad') || combined.includes('anime') || combined.includes('caricatura')) return 'animados';
+      if (combined.includes('manga') || combined.includes('comic')) return 'manga';
+      if (combined.includes('novel')) return 'novelas';
+      if (combined.includes('serie')) return 'series';
+      if (combined.includes('pelicul') || combined.includes('movie') || combined.includes('cine')) return 'peliculas';
+      if (hasGenre) return 'peliculas';
+      return 'animados';
+    }
+
+    function normalizeGenre(val) {
+      const clean = normalizeText(val);
+      if (clean.includes('comand') || clean.includes('belic') || clean.includes('guerra')) return 'comando';
+      if (clean.includes('comed')) return 'comedia';
+      if (clean.includes('dram')) return 'drama';
+      if (clean.includes('terror') || clean.includes('horror') || clean.includes('miedo')) return 'terror';
+      if (clean.includes('ficcion') || clean.includes('sci') || clean.includes('ciencia')) return 'ciencia-ficcion';
+      return 'accion';
+    }
+
+    function isDirectImageUrl(url) {
+      const clean = String(url || '').trim();
+      if (!clean) return false;
+      if (clean.includes('google.com/search') || clean.includes('tbm=isch')) return false;
+      return clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('data:image/');
+    }
+
+    function parseSheetRowsWithSmartHeader(worksheet) {
+      const rawMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+      if (!Array.isArray(rawMatrix) || rawMatrix.length === 0) return [];
+
+      const headerTokens = [
+        'nombre', 'titulo', 'título', 'titulo de la pelicula', 'título de la película',
+        'title', 'pelicula', 'película', 'serie', 'novela', 'manga'
+      ];
+      let headerRowIndex = 0;
+
+      for (let r = 0; r < Math.min(rawMatrix.length, 10); r++) {
+        const rowCells = rawMatrix[r].map(c => normalizeText(c));
+        const hasHeader = rowCells.some(cell => headerTokens.includes(cell));
+        if (hasHeader) {
+          headerRowIndex = r;
+          break;
+        }
+      }
+
+      const headers = rawMatrix[headerRowIndex].map((h, idx) => {
+        const cleaned = String(h || '').trim();
+        return cleaned || `col_${idx}`;
+      });
+
+      const parsedRows = [];
+      for (let r = headerRowIndex + 1; r < rawMatrix.length; r++) {
+        const row = rawMatrix[r];
+        if (!Array.isArray(row) || row.every(cell => String(cell || '').trim() === '')) continue;
+
+        const obj = {};
+        headers.forEach((h, idx) => {
+          obj[h] = row[idx] !== undefined ? row[idx] : '';
+        });
+        parsedRows.push(obj);
+      }
+
+      return parsedRows;
+    }
+
+    /* IMPORTAR EXCEL CON MODAL DE CONTRASEÑA SEGURO */
+    document.getElementById('triggerImportExcelBtn').addEventListener('click', () => {
+      modalPasswordInput.value = '';
+      passwordModal.classList.replace('hidden', 'flex');
+      setTimeout(() => modalPasswordInput.focus(), 50);
+    });
+
+    document.getElementById('cancelPasswordModal').addEventListener('click', () => {
+      passwordModal.classList.replace('flex', 'hidden');
+    });
+
+    document.getElementById('confirmPasswordModal').addEventListener('click', () => {
+      if (modalPasswordInput.value !== ADMIN_PASSWORD) {
+        alert("Contraseña incorrecta.");
+        return;
+      }
+      passwordModal.classList.replace('flex', 'hidden');
+      const fileInput = document.getElementById('importExcelFile');
+      fileInput.value = '';
+      fileInput.click();
+    });
+
+    modalPasswordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('confirmPasswordModal').click();
+      }
+    });
+
+    document.getElementById('importExcelFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          await ensureXlsxLoaded();
+          const data = new Uint8Array(event.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          if (!workbook || !Array.isArray(workbook.SheetNames) || workbook.SheetNames.length === 0) {
+            alert('No se pudieron leer las hojas del archivo Excel.');
+            return;
+          }
+          const targetSheetName = workbook.SheetNames.includes('Catalogo_Peliculas')
+            ? 'Catalogo_Peliculas'
+            : workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[targetSheetName];
+          const rows = parseSheetRowsWithSmartHeader(worksheet);
+
+          if (!rows || rows.length === 0) {
+            alert('La hoja de Excel está vacía.');
+            return;
+          }
+
+          deletedKeys.clear();
+          saveDeletedKeys();
+
+          const existingByKey = new Map();
+          mediaData.forEach((item) => {
+            existingByKey.set(getItemKey(item.category, item.title), item);
+          });
+
+          const importedItems = [];
+          const itemsNeedingEnrich = [];
+          const allExcelKeys = new Set();
+
+          rows.forEach((row) => {
+            const normalizedRow = {};
+            Object.keys(row).forEach((k) => {
+              normalizedRow[normalizeText(k)] = row[k];
+            });
+
+            const rawTitle = String(
+              normalizedRow['titulo de la pelicula'] || normalizedRow.titulo || normalizedRow.title || normalizedRow.nombre || ''
+            ).replace(/\s+/g, ' ').trim();
+
+            const normalizedTitle = normalizeText(rawTitle);
+            if (!rawTitle || normalizedTitle === 'total' || normalizedTitle.startsWith('total de')) return;
+
+            const rawGenre = String(normalizedRow.genero || normalizedRow.genre || '').trim();
+            const rawCategory = String(normalizedRow.categoria || normalizedRow.category || normalizedRow.tipo || '').trim();
+            const category = inferCategoryFromContext(rawCategory, rawGenre !== '', file.name, targetSheetName);
+            const itemKey = getItemKey(category, rawTitle);
+            allExcelKeys.add(itemKey);
+
+            const candidateImg = String(
+              normalizedRow['enlace directo una sola foto'] ||
+              normalizedRow.portada ||
+              normalizedRow.imagen ||
+              normalizedRow.image ||
+              normalizedRow['direccion web de imagen'] ||
+              normalizedRow.url ||
+              ''
+            ).trim();
+            const rawImage = isDirectImageUrl(candidateImg) ? candidateImg : '';
+
+            const rawYear = String(normalizedRow.ano || normalizedRow.anio || normalizedRow.year || '').trim();
+            const rawSynopsis = String(
+              normalizedRow.sinopsis || normalizedRow.descripcion || normalizedRow.info || ''
+            ).trim();
+
+            if (existingByKey.has(itemKey)) {
+              const existingItem = existingByKey.get(itemKey);
+              existingItem.category = category;
+              existingItem.type = categoryNames[category];
+              if (rawYear) existingItem.year = rawYear;
+              if (rawImage) existingItem.image = rawImage;
+              if (rawSynopsis) existingItem.info = rawSynopsis;
+              if (!existingItem.image || !existingItem.info) itemsNeedingEnrich.push(existingItem);
+              return;
+            }
+
+            const genre = category === 'peliculas' ? normalizeGenre(rawGenre) : null;
+            const rawCountry = normalizedRow.pais || normalizedRow.country || normalizedRow.origen || 'mexico';
+            const country = category === 'novelas' ? normalizeCountry(rawCountry) : null;
+            const cachedImg = rawImage || imageCache.get(`img:${category}:${normalizeText(rawTitle)}`) || '';
+
+            const newItem = normalizeRecord({
+              id: 'xl_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+              title: rawTitle,
+              year: rawYear,
+              category,
+              type: categoryNames[category],
+              genre,
+              country,
+              image: cachedImg,
+              info: rawSynopsis
+            });
+
+            existingByKey.set(itemKey, newItem);
+            importedItems.push(newItem);
+            if (!newItem.image || !newItem.info) itemsNeedingEnrich.push(newItem);
+          });
+
+          if (allExcelKeys.size === 0) {
+            alert('No se encontraron títulos válidos en el Excel.');
+            return;
+          }
+
+          mediaData = Array.from(existingByKey.values()).filter(item => allExcelKeys.has(getItemKey(item.category, item.title)));
+          wallpaperIndex = 0;
+          saveAndRender();
+          showHomeView();
+
+          const { savedImages, savedInfos } = await importAndEnrichExcelItems(itemsNeedingEnrich);
+          alert(`¡Excel sincronizado con éxito!\nSe cargaron ${mediaData.length} títulos (${savedImages} portadas y ${savedInfos} sinopsis obtenidas automáticamente).`);
+        } catch (err) {
+          console.error(err);
+          alert(`Error al importar "${file.name}": ${err?.message || 'revisa el formato del archivo.'}`);
+        } finally {
+          e.target.value = '';
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+
+    document.querySelectorAll('.big-bubble-btn').forEach(btn => {
+      btn.addEventListener('click', () => openCategory(btn.getAttribute('data-category')));
+    });
+    document.querySelectorAll('.big-genre-btn').forEach(btn => {
+      btn.addEventListener('click', () => openCategory('peliculas', btn.getAttribute('data-genre')));
+    });
+    document.querySelectorAll('.big-country-btn').forEach(btn => {
+      btn.addEventListener('click', () => openCategory('novelas', btn.getAttribute('data-country')));
+    });
+
+    document.querySelectorAll('.back-home-btn').forEach(btn => btn.addEventListener('click', showHomeView));
+    document.getElementById('logoHomeBtn').addEventListener('click', showHomeView);
+    backToGenresBtn.addEventListener('click', showMovieGenresView);
+    backToCountriesBtn.addEventListener('click', showNovelsCountriesView);
+
+    searchInput.addEventListener('input', e => {
+      searchQuery = e.target.value;
+      clearSearchBtn.classList.toggle('hidden', searchQuery.length === 0);
+      applyFilters();
+    });
+
+    clearSearchBtn.addEventListener('click', () => {
+      searchQuery = '';
+      searchInput.value = '';
+      clearSearchBtn.classList.add('hidden');
+      searchInput.focus();
+      applyFilters();
+    });
+
+    /* ELIMINAR DE LA WEB */
+    window.deleteItem = function(id) {
+      if (!requireAdminPassword()) return;
+      const target = mediaData.find(item => item.id === id);
+      if (target) {
+        deletedKeys.add(getItemKey(target.category, target.title));
+        saveDeletedKeys();
+      }
+      mediaData = mediaData.filter(item => item.id !== id);
+      saveAndRender();
+    };
+
+    showHomeView();
+  </script>
+</body>
+</html>
